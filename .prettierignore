@@ -20,4 +20,4 @@ pnpm-lock.yaml
 # その他
 *.log
 /coverage/
-src/graphql
+app/gql
