@@ -3,29 +3,25 @@ import { envConfig } from './envConfig';
 type FetchDataParams = {
   host: string;
   url: string;
-  cache: RequestCache;
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  headers?: Record<string, string>;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: any;
 };
 
 // TODO: ISRの対応ができていない
+// TODO: cacheの対応ができていない
 export const fetchData = async <T>({
   host,
   url,
-  cache,
   method = 'POST',
-  headers = {},
-  body = null,
+  body,
 }: FetchDataParams): Promise<T> => {
   const apiUrl = `${envConfig.API_PREFIX}${host}/api/${url}`;
   try {
     const response = await fetch(apiUrl, {
       method,
-      cache: cache,
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
-        ...headers,
       },
       body: body ? JSON.stringify(body) : null,
     });

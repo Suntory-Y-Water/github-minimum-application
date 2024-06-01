@@ -11,9 +11,9 @@ export default async function Home() {
   const data = await fetchData<GetRepositoriesQuery>({
     host: host,
     url: 'repositories',
-    cache: 'no-store',
-    method: 'GET',
+    method: 'POST',
   });
+
   return (
     <div className='max-w-4xl mx-auto my-10'>
       <ul className='divide-y'>
