@@ -61,11 +61,11 @@ const Repositories = ({ params }: Props) => {
             key={repository?.name}
             className='flex items-center justify-between p-4 hover:bg-muted/50'
           >
-            <Link href={`/issues/${repository?.name}`}>
+            <Link href={`/issues/${repository?.name}`} className='max-w-72 sm:max-w-none'>
               <p className='font-bold'>{repository?.name}</p>
               <p className='text-sm text-gray-600'>{repository?.description}</p>
             </Link>
-            <MdNavigateNext size={20} />
+            <MdNavigateNext />
           </li>
         ))
       ) : (
