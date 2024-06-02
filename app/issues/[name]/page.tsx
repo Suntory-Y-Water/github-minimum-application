@@ -35,8 +35,8 @@ const Home = async ({ params }: Props) => {
   }
 
   return (
-    <div className='max-w-4xl mx-auto my-4'>
-      <div className='flex items-center justify-center w-full my-4 relative'>
+    <div className='mx-auto my-4 max-w-4xl'>
+      <div className='relative my-4 flex w-full items-center justify-center'>
         <Link href='/' className='absolute left-0'>
           <IoIosArrowBack />
         </Link>

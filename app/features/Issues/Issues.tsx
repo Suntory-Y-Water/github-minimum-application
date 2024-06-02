@@ -12,11 +12,11 @@ type Props = {
 const Issues = ({ params }: Props) => {
   return (
     <>
-      {params?.repository?.issues.nodes?.length! > 0 ? (
+      {params?.repository?.issues.nodes?.length ?? 0 > 0 ? (
         params?.repository?.issues.nodes?.map((issue) => (
           <li
             key={issue?.title}
-            className='p-4 flex hover:bg-muted/50 space-x-1 items-center justify-between'
+            className='flex items-center justify-between space-x-1 p-4 hover:bg-muted/50'
           >
             <div className='flex items-center space-x-1'>
               <p aria-label={issue?.state}>{STATUS_TO_EMOJI[issue!.state]}</p>

@@ -5,7 +5,7 @@ import { gql } from '@apollo/client';
 import { NextResponse } from 'next/server';
 
 /**
- * @description 公開されているリポジトリから最新100件を取得する
+ * @description 公開されているリポジトリから最新n件を取得する
  */
 const GET_REPOSITORIES = gql`
   query GetRepositories($first: Int!, $after: String!) {
@@ -30,6 +30,9 @@ const GET_REPOSITORIES = gql`
   }
 `;
 
+/**
+ * @description リポジトリの一覧を取得する。1回で取得しきれない場合はページネーションから全て取得する
+ */
 export const POST = async () => {
   try {
     let after = '';
@@ -44,7 +47,7 @@ export const POST = async () => {
     while (hasNextPage) {
       const { data } = await client.query<GetRepositoriesQuery>({
         query: GET_REPOSITORIES,
-        variables: variables,
+        variables: { ...variables, after },
       });
       if (!data) {
         return NextResponse.json({
@@ -75,8 +78,9 @@ export const POST = async () => {
 
       hasNextPage = data.viewer.repositories.pageInfo.hasNextPage;
       after = data.viewer.repositories.pageInfo.endCursor || '';
-      if (!hasNextPage) {
-        break;
+
+      if (hasNextPage) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
     }
 

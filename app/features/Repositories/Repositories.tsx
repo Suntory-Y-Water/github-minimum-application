@@ -38,7 +38,8 @@ const Repositories = ({ params }: Props) => {
     repository?.name.includes(searchRepository),
   );
 
-  const allDisplayed = limitedRepositories?.length === params?.viewer.repositories.nodes?.length;
+  const allDisplayed =
+    limitedRepositories?.length === params?.viewer.repositories.nodes?.length;
 
   // inputに値が入っている場合、ボタンを表示させないため
   const isInputEmpty = searchRepository.length === 0;
@@ -58,7 +59,7 @@ const Repositories = ({ params }: Props) => {
         filteredRepositories!.map((repository) => (
           <li
             key={repository?.name}
-            className='flex p-4 items-center justify-between hover:bg-muted/50'
+            className='flex items-center justify-between p-4 hover:bg-muted/50'
           >
             <Link href={`/issues/${repository?.name}`}>
               <p className='font-bold'>{repository?.name}</p>

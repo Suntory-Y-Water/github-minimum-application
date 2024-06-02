@@ -15,7 +15,7 @@ export default async function Home() {
   });
 
   return (
-    <div className='max-w-4xl mx-auto my-10'>
+    <div className='mx-auto my-10 max-w-4xl'>
       <ul className='divide-y'>
         <Repositories params={data} />
       </ul>

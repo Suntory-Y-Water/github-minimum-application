@@ -8,7 +8,30 @@ const client = new ApolloClient({
       authorization: `Bearer ${envConfig.GITHUB_ACCESS_TOKEN}`,
     },
   }),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      User: {
+        keyFields: ['login'],
+      },
+      Repository: {
+        keyFields: ['name'],
+      },
+      Query: {
+        fields: {
+          viewer: {
+            read(existing, { toReference }) {
+              return existing || toReference({ __typename: 'User', login: envConfig.USER_NAME });
+            },
+          },
+          repository: {
+            merge(existing, incoming, { mergeObjects }) {
+              return mergeObjects(existing, incoming);
+            },
+          },
+        },
+      },
+    },
+  }),
 });
 
 export default client;

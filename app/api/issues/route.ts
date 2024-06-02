@@ -1,6 +1,5 @@
 import { Constants } from '@/app/constants';
 import {
-  GetRepositoriesQuery,
   GetRepositoryIssuesQuery,
   GetRepositoryIssuesQueryVariables,
 } from '@/app/gql/graphql';
@@ -10,13 +9,22 @@ import { gql } from '@apollo/client';
 import { NextResponse } from 'next/server';
 
 /**
- * @description
+ * @description リポジトリのIssueを取得するクエリ
  */
 const GET_REPOSITORY_ISSUES = gql`
-  query GetRepositoryIssues($name: String!, $owner: String!, $first: Int!, $after: String!) {
+  query GetRepositoryIssues(
+    $name: String!
+    $owner: String!
+    $first: Int!
+    $after: String!
+  ) {
     repository(name: $name, owner: $owner) {
       name
-      issues(first: $first, after: $after, orderBy: { field: CREATED_AT, direction: DESC }) {
+      issues(
+        first: $first
+        after: $after
+        orderBy: { field: CREATED_AT, direction: DESC }
+      ) {
         nodes {
           title
           createdAt
@@ -37,6 +45,10 @@ const GET_REPOSITORY_ISSUES = gql`
   }
 `;
 
+/**
+ * @parmas request: ExtendNextRequest<IssuesRequest>
+ * @description リクエストから受け取ったリポジトリのIssueを取得する
+ */
 export const POST = async (request: ExtendNextRequest<IssuesRequest>) => {
   try {
     const body = await request.json();
@@ -53,7 +65,7 @@ export const POST = async (request: ExtendNextRequest<IssuesRequest>) => {
     while (hasNextPage) {
       const { data } = await client.query<GetRepositoryIssuesQuery>({
         query: GET_REPOSITORY_ISSUES,
-        variables: variables,
+        variables: { ...variables, after },
       });
       if (!data) {
         return NextResponse.json({
@@ -91,8 +103,9 @@ export const POST = async (request: ExtendNextRequest<IssuesRequest>) => {
       hasNextPage = data.repository?.issues.pageInfo.hasNextPage || false;
       after = data.repository?.issues.pageInfo.endCursor || '';
 
-      if (!hasNextPage) {
-        break;
+      // 待機処理の追加
+      if (hasNextPage) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
     }
 

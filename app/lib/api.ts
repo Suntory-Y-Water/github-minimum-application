@@ -5,7 +5,7 @@ type FetchDataParams = {
   host: string;
   url: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  body?: any;
+  body?: unknown;
 };
 
 export const fetchData = async <T>({
