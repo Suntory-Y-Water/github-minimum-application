@@ -1,6 +1,6 @@
 export const envConfig = {
   GITHUB_ACCESS_TOKEN: process.env.GITHUB_ACCESS_TOKEN,
-  USER_NAME: process.env.USER_NAME,
+  USER_NAME: process.env.GITHUB_USER_NAME,
   API_PREFIX: process.env.API_PREFIX,
 };
 

@@ -6,6 +6,8 @@ import { Input } from '@/app/components/ui/input';
 import { GetRepositoriesQuery } from '@/app/gql/graphql';
 import { MdNavigateNext } from 'react-icons/md';
 import { useState } from 'react';
+import { Constants } from '@/app/constants';
+import NotElement from '../Common/NotElement';
 
 type Props = {
   params: GetRepositoriesQuery;
@@ -14,18 +16,16 @@ type Props = {
 const Repositories = ({ params }: Props) => {
   const [searchRepository, setSearchRepository] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  // TODO: 初期表示するリポジトリの数を管理。初期値は定数で管理する
-  const [displayCount, setDisplayCount] = useState<number>(10);
+  const [displayCount, setDisplayCount] = useState<number>(Constants.DISPLAY_COUNT);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchRepository(e.target.value.toLowerCase());
+    setSearchRepository(e.target.value);
   };
 
   const handleClick = () => {
     setLoading(true);
     setTimeout(() => {
-      // TODO: 表示件数は定数で管理する
-      setDisplayCount((prevCount) => prevCount + 10);
+      setDisplayCount((prevCount) => prevCount + Constants.DISPLAY_COUNT);
       setLoading(false);
     }, 1000);
   };
@@ -35,7 +35,7 @@ const Repositories = ({ params }: Props) => {
 
   // 制限されたリポジトリの中で検索
   const filteredRepositories = limitedRepositories?.filter((repository) =>
-    repository?.name.toLowerCase().includes(searchRepository),
+    repository?.name.includes(searchRepository),
   );
 
   const allDisplayed = limitedRepositories?.length === params?.viewer.repositories.nodes?.length;
@@ -54,18 +54,22 @@ const Repositories = ({ params }: Props) => {
           onChange={handleSearch}
         />
       </div>
-      {filteredRepositories?.map((repository) => (
-        <li
-          key={repository?.name}
-          className='flex p-4 items-center justify-between hover:bg-muted/50'
-        >
-          <Link href={`/issues/${repository?.name}`}>
-            <p className='font-bold'>{repository?.name}</p>
-            <p className='text-sm text-gray-600'>{repository?.description}</p>
-          </Link>
-          <MdNavigateNext size={20} />
-        </li>
-      ))}
+      {filteredRepositories!.length > 0 ? (
+        filteredRepositories!.map((repository) => (
+          <li
+            key={repository?.name}
+            className='flex p-4 items-center justify-between hover:bg-muted/50'
+          >
+            <Link href={`/issues/${repository?.name}`}>
+              <p className='font-bold'>{repository?.name}</p>
+              <p className='text-sm text-gray-600'>{repository?.description}</p>
+            </Link>
+            <MdNavigateNext size={20} />
+          </li>
+        ))
+      ) : (
+        <NotElement params={{ element: 'リポジトリ' }} />
+      )}
       {!allDisplayed && isInputEmpty && (
         <LoadingButton loading={loading} className='mt-4 w-full' onClick={handleClick}>
           もっとリポジトリを見る

@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { envConfig } from './envConfig';
 
 type FetchDataParams = {
@@ -7,8 +8,6 @@ type FetchDataParams = {
   body?: any;
 };
 
-// TODO: ISRの対応ができていない
-// TODO: cacheの対応ができていない
 export const fetchData = async <T>({
   host,
   url,
@@ -19,7 +18,6 @@ export const fetchData = async <T>({
   try {
     const response = await fetch(apiUrl, {
       method,
-      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -27,12 +25,14 @@ export const fetchData = async <T>({
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      console.error(`HTTP error! status: ${response.status}`);
+      notFound();
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
+    console.error(`Failed to fetch data from ${apiUrl}: ${error}`);
     throw error;
   }
 };

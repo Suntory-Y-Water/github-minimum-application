@@ -1,4 +1,5 @@
-import { GetRepositoriesQuery } from '@/app/gql/graphql';
+import { Constants } from '@/app/constants';
+import { GetRepositoriesQuery, GetRepositoriesQueryVariables } from '@/app/gql/graphql';
 import client from '@/app/lib/apolloClient';
 import { gql } from '@apollo/client';
 import { NextResponse } from 'next/server';
@@ -7,10 +8,10 @@ import { NextResponse } from 'next/server';
  * @description 公開されているリポジトリから最新100件を取得する
  */
 const GET_REPOSITORIES = gql`
-  query GetRepositories($after: String!) {
+  query GetRepositories($first: Int!, $after: String!) {
     viewer {
       repositories(
-        first: 100
+        first: $first
         after: $after
         orderBy: { field: CREATED_AT, direction: DESC }
         privacy: PUBLIC
@@ -35,10 +36,15 @@ export const POST = async () => {
     let repositories: GetRepositoriesQuery | null = null;
     let hasNextPage = true;
 
+    const variables: GetRepositoriesQueryVariables = {
+      first: Constants.FETCH_COUNT,
+      after: after,
+    };
+
     while (hasNextPage) {
       const { data } = await client.query<GetRepositoriesQuery>({
         query: GET_REPOSITORIES,
-        variables: { after: after },
+        variables: variables,
       });
       if (!data) {
         return NextResponse.json({
