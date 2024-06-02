@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# GitHub Minimum Client Application
 
-## Getting Started
+## 概要
 
-First, run the development server:
+GitHub GraphQL APIを使用したミニマルなアプリケーションです。初期画面でリポジトリの一覧を表示し、リポジトリをクリックすると該当のイシュー一覧画面に遷移します。
+
+## 主な機能
+
+### レポジトリ検索機能
+
+- 入力したテキストをもとに、GitHubの公開リポジトリを検索しリスト表示
+- 公開リポジトリ名をクリックすると、対応するイシュー閲覧ページに遷移
+- 「もっとリポジトリを見る」ボタンで検索結果を追加読み込み
+
+### イシュー閲覧機能
+
+- 特定のリポジトリに紐づくイシューのタイトルをリスト表示
+
+### 検索フィルター機能
+
+- リポジトリ検索画面でリポジトリのタイトルを入力して検索
+
+### イシューのアイコン表示
+
+- GitHubのイシューラベルに絵文字を付加し、非言語でイシューの内容を直感的に理解可能
+- ラベルに応じた絵文字を追加することも可能
+
+## 環境設定と開発サーバの起動
+
+### 必要な環境変数
+
+| 変数名 | 説明 |
+| --- | --- |
+| GITHUB_ACCESS_TOKEN | GitHubのpersonal access token |
+| GITHUB_USER_NAME | GitHubのユーザー名 |
+| API_PREFIX | URLの頭の部分(ローカルの場合→http://、デプロイ後→https://) |
+
+### 開発サーバの起動方法
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 実装上の考慮点
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Next.jsの採用理由
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+1. セキュリティの向上：
+[GitHub GraphQL API](https://docs.github.com/ja/graphql)は`personal access token`を必要とします。クライアント側でAPIを実行するとtoken情報が漏洩するリスクがあるため、Next.jsのRoute Handlersを用いてバックエンドからAPIを実行することでtoken情報を秘匿しています。
+2. 効率的なルーティング：
+Next.jsはルーティングが直感的で管理しやすい特徴があり、アプリケーションの構造をより明確に保つことができます。
 
-## Learn More
+### GraphQLとキャッシュの最適化
 
-To learn more about Next.js, take a look at the following resources:
+当初は、リポジトリ一覧画面で初期表示時に10件のリポジトリを表示し、「もっと見る」ボタンを押すごとに追加の10件を取得する予定でしたが、この方式には問題がありました。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. キャッシュの不整合：
+追加データ（11~20件目）を取得すると、そのデータがキャッシュに登録されます。画面リロード時、キャッシュから取得したデータが表示され、意図しない順序（11~20件目から）で表示されてしまう。
+2. 過剰なAPI呼び出し：
+キャッシュを無効にすると画面遷移のたびにAPIが実行されてしまうため、不要なAPI呼び出しとなってしまう。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+そのため、以下で案で実装をしました。
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. 一括データ取得：
+GraphQLでは全件取得は推奨されていませんが、UIのスムーズな動作を優先し、初回に全データ（リポジトリ、イシューともに100件）を取得します。
+2. 繰り返しフェッチによるキャッシュ管理：
+[GitHub GraphQL API](https://docs.github.com/ja/graphql)を繰り返し実行して画面にレスポンスすることで、キャッシュを効果的に管理します。

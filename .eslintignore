@@ -1,0 +1,14 @@
+.eslintrc.js
+.prettierignore
+next.config.js
+tailwind.config.ts
+tsconfig.json
+postcss.config.js
+build/
+bin/
+obj/
+out/
+.next/
+.vscode/
+app/gql/
+coverage/
