@@ -31,6 +31,7 @@ const Issues = ({ params }: Props) => {
                 href={`https://github.com/${envConfig.USER_NAME}/${params?.repository?.name}/issues/${issue?.number}`}
                 target='_blank'
                 rel='noopener noreferrer'
+                className='max-w-72 sm:max-w-none'
               >
                 {issue?.title}
               </a>
